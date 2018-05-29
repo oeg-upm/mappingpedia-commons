@@ -7,7 +7,7 @@ import java.util.Properties
 
 import com.mashape.unirest.http.Unirest
 import es.upm.fi.dia.oeg.mappingpedia.model.result.ListResult
-import es.upm.fi.dia.oeg.mappingpedia.utility.MappingpediaCommonsCKANUtility.logger
+import es.upm.fi.dia.oeg.mappingpedia.utility.MpcCkanUtility.logger
 import es.upm.fi.dia.oeg.mappingpedia.{MappingPediaConstant, MappingPediaProperties}
 import org.json.{JSONArray, JSONObject}
 import org.slf4j.{Logger, LoggerFactory}
@@ -25,7 +25,7 @@ import org.apache.http.util.EntityUtils
 import scala.collection.mutable.ListBuffer
 
 
-class MappingpediaCommonsCKANUtility(val ckanUrl: String, val authorizationToken: String) {
+class MpcCkanUtility(val ckanUrl: String, val authorizationToken: String) {
   val logger: Logger = LoggerFactory.getLogger(this.getClass);
 
   val CKAN_API_ACTION_ORGANIZATION_SHOW_URL = ckanUrl + "/api/action/organization_show";
@@ -242,7 +242,7 @@ class MappingpediaCommonsCKANUtility(val ckanUrl: String, val authorizationToken
   }
 }
 
-object MappingpediaCommonsCKANUtility {
+object MpcCkanUtility {
   val logger: Logger = LoggerFactory.getLogger(this.getClass);
 
 

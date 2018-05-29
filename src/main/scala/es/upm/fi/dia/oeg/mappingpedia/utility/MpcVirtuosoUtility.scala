@@ -11,8 +11,8 @@ import virtuoso.jena.driver.{VirtGraph, VirtModel, VirtuosoQueryExecutionFactory
 
 import scala.collection.JavaConversions._
 
-class MappingpediaCommonsVirtuosoUtility(val virtuosoJDBC:String, val virtuosoUser:String, val virtuosoPwd:String
-                                         , val virtuosoGraphName:String
+class MpcVirtuosoUtility(val virtuosoJDBC:String, val virtuosoUser:String, val virtuosoPwd:String
+                         , val virtuosoGraphName:String
                                        ) {
   val logger: Logger = LoggerFactory.getLogger(this.getClass);
 

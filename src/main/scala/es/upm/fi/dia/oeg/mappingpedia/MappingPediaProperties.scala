@@ -83,25 +83,12 @@ class MappingPediaProperties(is:InputStream, reader:Reader) extends Properties {
 	val githubEnabled = this.getPropertyAsBoolean("github.enabled", true);
 	val githubUser:String = this.getProperty("github.mappingpedia.username")
 	val githubAccessToken:String = this.getProperty("github.mappingpedia.accesstoken")
-	//val githubRepo = this.getProperty("github.mappingpedia.repository", MappingPediaConstant.DEFAULT_GITHUB_REPOSITORY)
-	//val githubRepoContents = this.getProperty("github.mappingpedia.repository.contents", MappingPediaConstant.DEFAULT_GITHUB_REPOSITORY_CONTENTS)
-
-	/*
-	val githubUsername = this.getProperty("github.username", "oeg-upm");
-	val githubRepository = this.getProperty("github.repository", "mappingpedia-contents");
-	*/
 	val githubRepository = this.getProperty("github.repository", "oeg-upm/mappingpedia-contents");
 
 
 	//CKAN
 	val ckanEnable = this.getPropertyAsBoolean("ckan.enabled", true);
 	val ckanKey:String = this.getProperty("ckan.key")
-	/*
-    val ckanActionOrganizationCreate:String=this.getProperty("ckan.action.organization.create")
-    val ckanActionPackageCreate:String=this.getProperty("ckan.action.package.create")
-    val ckanActionResourceCreate:String=this.getProperty("ckan.action.resource.create")
-  */
-
 	val ckanURL:String = this.getProperty("ckan.url")
 	val ckanActionOrganizationCreate:String=ckanURL + "/api/action/organization_create"
 	val ckanActionOrganizationShow:String=ckanURL + "/api/action/organization_show"

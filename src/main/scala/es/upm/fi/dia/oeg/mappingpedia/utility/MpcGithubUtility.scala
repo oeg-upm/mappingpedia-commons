@@ -13,7 +13,7 @@ import org.slf4j.{Logger, LoggerFactory}
 /**
   * Created by fpriyatna on 21/02/2017.
   */
-class MappingpediaCommonsGitHubUtility(githubRepository:String, githubUsername:String, githubAccessToken:String) {
+class MpcGithubUtility(githubRepository:String, githubUsername:String, githubAccessToken:String) {
   val logger: Logger = LoggerFactory.getLogger(this.getClass);
   //val githubRepository:String = MappingPediaEngine.mappingpediaProperties.githubRepository;
   //val githubUsername:String = MappingPediaEngine.mappingpediaProperties.githubUser;
@@ -167,18 +167,18 @@ class MappingpediaCommonsGitHubUtility(githubRepository:String, githubUsername:S
   }
 
   def encodeAndPutFile(organizationId:String, datasetId:String, filename:String, message:String, file:File) = {
-    val base64EncodedContent = MappingpediaCommonsGitHubUtility.encodeToBase64(file);
+    val base64EncodedContent = MpcGithubUtility.encodeToBase64(file);
     this.putEncodedContent(organizationId, datasetId, filename, message, base64EncodedContent)
   }
 
   def encodeAndPutFile(filePath:String, message:String, file:File) = {
-    val base64EncodedContent = MappingpediaCommonsGitHubUtility.encodeToBase64(file);
+    val base64EncodedContent = MpcGithubUtility.encodeToBase64(file);
     this.putEncodedContent(filePath, message, base64EncodedContent)
   }
 
 }
 
-object MappingpediaCommonsGitHubUtility {
+object MpcGithubUtility {
   /*
   val stringToEncode = "foo";
   val encodedX = BaseEncoding.base32().encode(stringToEncode.getBytes(Charsets.US_ASCII))

@@ -9,7 +9,7 @@ import org.apache.jena.rdf.model.ResourceFactory
   * Created by freddy on 10/08/2017.
   */
 object MappingPediaConstant {
-	val MAPPINGPEDIA_ENGINE_VERSION = "0.9.0";
+	val MAPPINGPEDIA_ENGINE_VERSION = "1.0.0";
 
   //RDB2RDF Test related constants
 	//private val RDB2RDFTEST_NS = "http://purl.org/NET/rdb2rdf-test#";
@@ -95,4 +95,32 @@ object MappingPediaConstant {
 	val SDF = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
 	val DEFAULT_CONFIGURATION_FILENAME = "config.properties";
+
+	//CKAN
+	val CKAN_ENABLE = "ckan.enabled";
+	val CKAN_KEY = "ckan.key"
+	val CKAN_URL = "ckan.url"
+	val CKAN_API_ACTION_ORGANIZATION_CREATE = "/api/action/organization_create"
+	val CKAN_API_ACTION_ORGANIZATION_SHOW = "/api/action/organization_show"
+	val CKAN_ACTION_PACKAGE_CREATE  = "/api/action/package_create"
+	val CKAN_ACTION_PACKAGE_SHOW = "/api/action/package_show"
+	val CKAN_ACTION_PACKAGE_UPDATE = "/api/action/package_update"
+	val CKAN_ACTION_RESOURCe_CREATE = "/api/action/resource_create"
+	val CKAN_ACTION_RESOURCE_SHOW = "/api/action/resource_show"
+
+  //GITHUB
+  val GITHUB_ENABLED = "github.enabled"
+  val GITHUB_USER = "github.mappingpedia.username"
+  val GITHUB_ACCESS_TOKEN = "github.mappingpedia.accesstoken"
+  val GITHUB_REPOSITORY = "github.repository";
+
+  //VIRTUOSO
+  val VIRTUOSO_ENABLED = "virtuoso.enabled"
+  val VIRTUOSO_JDBC = "vjdbc"
+  val VIRTUOSO_USER = "usr"
+  val VIRTUOSO_PWD = "pwd"
+
+  //GRAPH
+  val GRAPH_NAME = "graphname"
+  val CLEAR_GRAPH = "cleargraph"
 }
