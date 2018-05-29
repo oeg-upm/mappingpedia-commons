@@ -81,8 +81,13 @@ object MappingPediaConstant {
 	val SCHEMA_RANGE_INCLUDES_PROPERTY = ResourceFactory.createProperty("http://schema.org/rangeIncludes");
 	val SCHEMA_DOMAIN_INCLUDES_PROPERTY = ResourceFactory.createProperty("http://schema.org/domainIncludes");
 
+  // CKAN STANDARD FIELDS
+  val CKAN_FIELD_NAME = "name";
+  val CKAN_FIELD_DESCRIPTION = "description";
+  val CKAN_FIELD_PACKAGE_ID = "package_id";
+  val CKAN_FIELD_URL = "url";
 
-	// CUSTOM CKAN FIELDS
+	// CKAN CUSTOM FIELDS
 	val CKAN_RESOURCE_ORIGINAL_DATASET_DISTRIBUTION_DOWNLOAD_URL = "original_dataset_distribution_download_url";
 	val CKAN_RESOURCE_MAPPING_DOCUMENT_DOWNLOAD_URL = "mapping_document_download_url";
 	val CKAN_RESOURCE_PROV_TRIPLES = "prov_triples";
@@ -96,17 +101,18 @@ object MappingPediaConstant {
 
 	val DEFAULT_CONFIGURATION_FILENAME = "config.properties";
 
-	//CKAN
+	//CKAN CONFIGURATION
 	val CKAN_ENABLE = "ckan.enabled";
 	val CKAN_KEY = "ckan.key"
 	val CKAN_URL = "ckan.url"
 	val CKAN_API_ACTION_ORGANIZATION_CREATE = "/api/action/organization_create"
 	val CKAN_API_ACTION_ORGANIZATION_SHOW = "/api/action/organization_show"
-	val CKAN_ACTION_PACKAGE_CREATE  = "/api/action/package_create"
-	val CKAN_ACTION_PACKAGE_SHOW = "/api/action/package_show"
-	val CKAN_ACTION_PACKAGE_UPDATE = "/api/action/package_update"
-	val CKAN_ACTION_RESOURCe_CREATE = "/api/action/resource_create"
-	val CKAN_ACTION_RESOURCE_SHOW = "/api/action/resource_show"
+	val CKAN_API_ACTION_PACKAGE_CREATE  = "/api/action/package_create"
+	val CKAN_API_ACTION_PACKAGE_SHOW = "/api/action/package_show"
+	val CKAN_API_ACTION_PACKAGE_UPDATE = "/api/action/package_update"
+	val CKAN_API_ACTION_RESOURCE_CREATE = "/api/action/resource_create"
+  val CKAN_API_ACTION_RESOURCE_SHOW = "/api/action/resource_show"
+  val CKAN_API_ACTION_RESOURCE_UPDATE = "/api/action/resource_update"
 
   //GITHUB
   val GITHUB_ENABLED = "github.enabled"

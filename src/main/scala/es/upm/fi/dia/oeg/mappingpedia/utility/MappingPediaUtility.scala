@@ -32,6 +32,7 @@ object MappingPediaUtility {
 
 
 
+
   /*
   def getVirtuosoGraph(virtuosoJDBC : String, virtuosoUser : String, virtuosoPwd : String
                        , virtuosoGraphName : String) : VirtGraph = {

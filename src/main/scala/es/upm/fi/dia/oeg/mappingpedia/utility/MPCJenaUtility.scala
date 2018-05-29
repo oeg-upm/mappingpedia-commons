@@ -182,6 +182,8 @@ class MPCJenaUtility(val ontModel:OntModel) {
 }
 
 object MPCJenaUtility {
+
+
   def loadSchemaOrgOntology(virtuosoClient: MpcVirtuosoUtility, ontologyFileName:String, ontologyFormat:String) : OntModel = {
     val logger: Logger = LoggerFactory.getLogger(this.getClass);
 
