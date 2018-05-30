@@ -2,7 +2,9 @@ package es.upm.fi.dia.oeg.mappingpedia.utility
 
 
 import java.io.{ByteArrayInputStream, File, InputStream}
+import java.util.Properties
 
+import es.upm.fi.dia.oeg.mappingpedia.MappingPediaConstant
 import org.apache.jena.graph.Triple
 import org.apache.jena.rdf.model.{Model, ModelFactory}
 import org.apache.jena.util.FileManager
@@ -11,14 +13,47 @@ import virtuoso.jena.driver.{VirtGraph, VirtModel, VirtuosoQueryExecutionFactory
 
 import scala.collection.JavaConversions._
 
+object MpcVirtuosoUtility {
+  val logger: Logger = LoggerFactory.getLogger(this.getClass);
+
+  def apply(properties:Properties): MpcVirtuosoUtility  = {
+    new MpcVirtuosoUtility(
+      properties.getProperty(MappingPediaConstant.VIRTUOSO_JDBC)
+      , properties.getProperty(MappingPediaConstant.VIRTUOSO_USER)
+      , properties.getProperty(MappingPediaConstant.VIRTUOSO_PWD)
+      , properties.getProperty(MappingPediaConstant.GRAPH_NAME)
+    );
+  }
+
+  def apply(): MpcVirtuosoUtility = {
+    val propertiesFilePath = "/" + MappingPediaConstant.DEFAULT_CONFIGURATION_FILENAME;
+
+    val in = getClass.getResourceAsStream(propertiesFilePath)
+    val properties = new Properties();
+    properties.load(in)
+    logger.debug(s"properties.keySet = ${properties.keySet()}")
+
+    MpcVirtuosoUtility(properties)
+  }
+}
+
 class MpcVirtuosoUtility(val virtuosoJDBC:String, val virtuosoUser:String, val virtuosoPwd:String
                          , val virtuosoGraphName:String
-                                       ) {
+                        ) {
   val logger: Logger = LoggerFactory.getLogger(this.getClass);
 
   val virtGraph:VirtGraph = {
     logger.info("Connecting to Virtuoso Graph...");
-    new VirtGraph (virtuosoGraphName, virtuosoJDBC, virtuosoUser, virtuosoPwd);
+    val graph = try {
+      new VirtGraph (virtuosoGraphName, virtuosoJDBC, virtuosoUser, virtuosoPwd);
+    } catch {
+      case e:Exception => {
+        e.printStackTrace();
+        null
+      }
+    }
+    graph
+
   }
 
   val databaseModel = VirtModel.openDatabaseModel(virtuosoGraphName, virtuosoJDBC, virtuosoUser, virtuosoPwd);

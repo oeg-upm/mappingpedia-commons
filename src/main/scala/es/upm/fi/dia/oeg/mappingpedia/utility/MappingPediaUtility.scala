@@ -201,39 +201,6 @@ object MappingPediaUtility {
 
   }
 
-  def multipartFileToFile(fileRef:MultipartFile) : File = {
-    // Path where the uploaded files will be stored.
-    val uuid = UUID.randomUUID().toString();
-
-    val file = this.multipartFileToFile(fileRef, uuid);
-    file;
-  }
-
-  def multipartFileToFile(fileRef:MultipartFile, uuid:String) : File = {
-
-    // Create the input stream to uploaded files to read data from it.
-    val fis:FileInputStream = try {
-      if(fileRef != null) {
-        val inputStreamAux = fileRef.getInputStream().asInstanceOf[FileInputStream];
-        inputStreamAux;
-      } else {
-        val errorMessage = "can't process the uploaded file, fileRef is null";
-        throw new Exception(errorMessage);
-      }
-    } catch {
-      case e:Exception => {
-        e.printStackTrace();
-        throw e;
-      }
-    }
-
-    // Get the name of uploaded files.
-    val fileName = fileRef.getOriginalFilename();
-
-    val file = MappingPediaUtility.materializeFileInputStream(fis, uuid, fileName);
-    file;
-  }
-
 
 
   def readFromResourcesDirectory(filePath:String) : String = {

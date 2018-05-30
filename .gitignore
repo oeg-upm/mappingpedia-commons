@@ -3,3 +3,4 @@
 .idea/
 target/
 mappingpedia-commons.iml
+*.iml

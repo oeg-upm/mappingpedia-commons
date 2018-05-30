@@ -11,36 +11,45 @@ object MpcUtility {
   val logger: Logger = LoggerFactory.getLogger(this.getClass);
 
   def multipartFileToFile(fileRef:MultipartFile) : File = {
-    // Path where the uploaded files will be stored.
-    val uuid = UUID.randomUUID().toString();
+    val file = if(fileRef != null) {
+      // Path where the uploaded files will be stored.
+      val uuid = UUID.randomUUID().toString();
 
-    val file = this.multipartFileToFile(fileRef, uuid);
-    file;
+      this.multipartFileToFile(fileRef, uuid);
+    } else {
+      null
+    }
+    file
   }
 
   def multipartFileToFile(fileRef:MultipartFile, uuid:String) : File = {
+    val file = if(fileRef != null) {
+      // Create the input stream to uploaded files to read data from it.
+      val fis:FileInputStream = try {
+        if(fileRef != null) {
+          val inputStreamAux = fileRef.getInputStream().asInstanceOf[FileInputStream];
+          inputStreamAux;
+        } else {
+          val errorMessage = "can't process the uploaded file, fileRef is null";
+          throw new Exception(errorMessage);
+        }
+      } catch {
+        case e:Exception => {
+          e.printStackTrace();
+          throw e;
+        }
+      }
 
-    // Create the input stream to uploaded files to read data from it.
-    val fis:FileInputStream = try {
-      if(fileRef != null) {
-        val inputStreamAux = fileRef.getInputStream().asInstanceOf[FileInputStream];
-        inputStreamAux;
-      } else {
-        val errorMessage = "can't process the uploaded file, fileRef is null";
-        throw new Exception(errorMessage);
-      }
-    } catch {
-      case e:Exception => {
-        e.printStackTrace();
-        throw e;
-      }
+      // Get the name of uploaded files.
+      val fileName = fileRef.getOriginalFilename();
+
+      MappingPediaUtility.materializeFileInputStream(fis, uuid, fileName);
+    } else {
+      null
     }
+    file
 
-    // Get the name of uploaded files.
-    val fileName = fileRef.getOriginalFilename();
 
-    val file = MappingPediaUtility.materializeFileInputStream(fis, uuid, fileName);
-    file;
   }
 
   def generateStringFromTemplateFiles(map: Map[String, String]
