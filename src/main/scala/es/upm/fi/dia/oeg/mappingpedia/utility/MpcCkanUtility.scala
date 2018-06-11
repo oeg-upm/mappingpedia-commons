@@ -194,25 +194,37 @@ class MpcCkanUtility(val ckanUrl: String, val authorizationToken: String) {
   }
 
   def findPackageByPackageName(organizationId:String, packageName:String) = {
+    logger.info("findPackageByPackageName");
+
+
     val uri = s"${CKAN_API_ACTION_ORGANIZATION_SHOW_URL}?id=${organizationId}&include_datasets=true"
     logger.info(s"Hitting endpoint: $uri");
 
     val response = Unirest.get(uri)
       .header("Authorization", this.authorizationToken)
       .asJson();
+
     val responseBody = response.getBody;
+
     val result = responseBody.getObject().getJSONObject("result");
-    //println("result = " + result);
 
-    val packages = result.getJSONArray("packages");
-    //println("packages = " + packages);
+    val packages:JSONArray = result.getJSONArray("packages");
 
-    val packagesList = packages.toList
-    //println("packagesList = " + packagesList);
-    //println("packagesList.size = " + packagesList.size);
+    /*
+    import java.security.CodeSource
+    val klass = classOf[JSONArray]
+    val codeSource = klass.getProtectionDomain.getCodeSource
+    if (codeSource != null) {
+      logger.info(s"JSONArray is loaded from: ${codeSource.getLocation}");
+    }
+    */
+
+    val packagesList = packages.toIterator.toList
+    logger.info(s"packagesList");
+
     val filteredPackages = packagesList.filter(_.asInstanceOf[JSONObject].getString("title").equals(packageName))
-    println("filteredPackages = " + filteredPackages);
-    println("filteredPackages.size = " + filteredPackages.size);
+    logger.info(s"filteredPackages");
+
 
     filteredPackages.asInstanceOf[List[JSONObject]]
   }
