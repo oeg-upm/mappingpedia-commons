@@ -1,2 +1,7 @@
 *.class
 *.log
+.idea/
+target/
+mappingpedia-commons.iml
+*.iml
+src/main/resources/config.properties
