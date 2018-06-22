@@ -6,7 +6,7 @@ import java.security.MessageDigest
 import java.util.UUID
 
 import es.upm.fi.dia.oeg.mappingpedia.model.result.ListResult
-import es.upm.fi.dia.oeg.mappingpedia.model.{OntologyClass}
+import es.upm.fi.dia.oeg.mappingpedia.model.{Dataset, Distribution, OntologyClass}
 import es.upm.fi.dia.oeg.mappingpedia.{MappingPediaConstant, MappingPediaProperties}
 import org.apache.jena.graph.{Node, NodeFactory, Triple}
 import org.apache.jena.query.QuerySolution
@@ -242,7 +242,24 @@ object MappingPediaUtility {
     result;
   }
 
+  def calculateHash(dataset:Dataset) : String = {
+    val distributions = dataset.getDistributions;
+    logger.info(s"{distributions.length = ${distributions.length}")
 
+    this.calculateHash(distributions);
+  }
+
+  def calculateHash(distributions:List[Distribution]) : String = {
+    val datasetHashValue = distributions.foldLeft(0)((acc, distribution) => {
+      val distributionHashValue = MappingPediaUtility.calculateHash(
+        distribution.dcatDownloadURL, distribution.encoding);
+      logger.info(s"distributionHashValue = ${distributionHashValue}")
+      acc + distributionHashValue.toInt
+    })
+
+    logger.debug(s"datasetHashValue = ${datasetHashValue}")
+    datasetHashValue.toString
+  }
 
   def calculateHash(downloadURL:String) : String = {
     this.calculateHash(downloadURL, null);
