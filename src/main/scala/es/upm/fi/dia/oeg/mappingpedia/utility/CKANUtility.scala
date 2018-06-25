@@ -10,6 +10,7 @@ import es.upm.fi.dia.oeg.mappingpedia.model.result.ListResult
 import es.upm.fi.dia.oeg.mappingpedia.model.{Agent, Dataset, Distribution}
 import es.upm.fi.dia.oeg.mappingpedia.utility.CKANUtility.logger
 import es.upm.fi.dia.oeg.mappingpedia.{MappingPediaConstant, MappingPediaProperties}
+import eu.trentorise.opendata.jackan.CkanClient
 import org.json.JSONObject
 import org.slf4j.{Logger, LoggerFactory}
 
@@ -421,13 +422,13 @@ object CKANUtility {
   val logger: Logger = LoggerFactory.getLogger(this.getClass);
 
 
-//  def getDatasetList(catalogUrl:String) = {
-//    val cc: CkanClient = new CkanClient(catalogUrl)
-//    val datasetList = cc.getDatasetList.asScala
-//
-//    logger.info(s"ckanDatasetList $catalogUrl = " + datasetList)
-//    new ListResult[String](datasetList.size, datasetList)
-//  }
+  def getDatasetList(catalogUrl:String) = {
+    val cc: CkanClient = new CkanClient(catalogUrl)
+    val datasetList = cc.getDatasetList.asScala
+
+    logger.info(s"ckanDatasetList $catalogUrl = " + datasetList)
+    new ListResult[String](datasetList.size, datasetList)
+  }
 
   def getResult(response:CloseableHttpResponse) = {
     if(response == null) {
