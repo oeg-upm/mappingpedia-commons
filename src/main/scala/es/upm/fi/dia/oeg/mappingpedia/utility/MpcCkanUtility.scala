@@ -224,9 +224,12 @@ class MpcCkanUtility(val ckanUrl: String, val authorizationToken: String) {
   }
 
   def getResourceIdByResourceUrl(packageId:String, pResourceUrl:String) : String = {
-    logger.info(s"Hitting endpoint: ${CKAN_API_ACTION_PACKAGE_SHOW_URL}");
+    logger.info(s"getResourceIdByResourceUrl");
+    logger.info(s"\tpResourceUrl = ${pResourceUrl}");
+    val uri = s"${CKAN_API_ACTION_PACKAGE_SHOW_URL}?id=${packageId}"
+    logger.info(s"Hitting endpoint: ${uri}");
 
-    val response = Unirest.get(CKAN_API_ACTION_PACKAGE_SHOW_URL)
+    val response = Unirest.get(uri)
       .header("Authorization", this.authorizationToken)
       .asJson();
     val resources = response.getBody.getObject.getJSONObject("result").getJSONArray("resources");
