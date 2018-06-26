@@ -5,7 +5,7 @@ import scala.collection.JavaConverters._
 /**
   * Created by fpriyatna on 04/04/2017.
   */
-class ListResult [A] (val count:Integer, val results:List[A]) {
+class ListResult [A] (val count:Integer, val results:Iterable[A]) {
   def this(results:Iterable[A]) = {
     this(results.size, results)
   }
