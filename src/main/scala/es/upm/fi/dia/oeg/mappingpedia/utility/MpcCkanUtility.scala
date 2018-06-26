@@ -6,9 +6,11 @@ import java.net.HttpURLConnection
 import java.util.Properties
 
 import com.mashape.unirest.http.Unirest
+import es.upm.fi.dia.oeg.mappingpedia.model.Distribution
 import es.upm.fi.dia.oeg.mappingpedia.model.result.ListResult
 import es.upm.fi.dia.oeg.mappingpedia.utility.MpcCkanUtility.logger
 import es.upm.fi.dia.oeg.mappingpedia.{MappingPediaConstant, MappingPediaProperties}
+import eu.trentorise.opendata.jackan.CkanClient
 import org.json.{JSONArray, JSONObject}
 import org.slf4j.{Logger, LoggerFactory}
 
@@ -41,6 +43,124 @@ class MpcCkanUtility(val ckanUrl: String, val authorizationToken: String) {
   val CKAN_FIELD_PACKAGE_ID = "package_id";
   val CKAN_FIELD_URL = "url";
 
+  def createOrUpdateResource(createOrUpdateUrl:String, distribution: Distribution, textBodyMap:Option[Map[String, String]]) = {
+    //val dataset = distribution.dataset;
+
+    //val packageId = distribution.dataset.dctIdentifier;
+    val datasetPackageId = distribution.dataset.ckanPackageId;
+    val packageId = if(datasetPackageId == null) { distribution.dataset.dctIdentifier } else { datasetPackageId }
+    logger.info(s"packageId = $packageId")
+
+
+    logger.info(s"distribution.dcatDownloadURL = ${distribution.dcatDownloadURL}")
+
+    val httpClient = HttpClientBuilder.create.build
+    try {
+
+      //val createOrUpdateUrl = ckanUrl + ckanAction
+      logger.info(s"Hitting endpoint: $createOrUpdateUrl");
+
+      val httpPostRequest = new HttpPost(createOrUpdateUrl)
+      httpPostRequest.setHeader("Authorization", authorizationToken)
+      val builder = MultipartEntityBuilder.create()
+        .addTextBody(CKAN_FIELD_PACKAGE_ID, packageId)
+        .addTextBody(CKAN_FIELD_URL, distribution.dcatDownloadURL)
+      ;
+
+      logger.info(s"distribution.dctTitle = ${distribution.dctTitle}")
+      if(distribution.dctTitle != null) {
+        builder.addTextBody(CKAN_FIELD_NAME, distribution.dctTitle)
+      }
+
+      logger.info(s"distribution.dctDescription = ${distribution.dctDescription}")
+      if(distribution.dctDescription != null) {
+        builder.addTextBody(CKAN_FIELD_DESCRIPTION, distribution.dctDescription)
+      }
+
+      logger.info(s"dataset.dcatMediaType = ${distribution.dcatMediaType}")
+      if(distribution.dcatMediaType != null) {
+        builder.addTextBody("mimetype", distribution.dcatMediaType)
+      }
+
+      logger.info(s"dataset.distributionFile = ${distribution.distributionFile}")
+      if(distribution.distributionFile != null) {
+        builder.addBinaryBody("upload", distribution.distributionFile)
+      }
+
+      if(distribution.dctLanguage != null) {
+        builder.addTextBody("language", distribution.dctLanguage)
+      }
+
+      if(distribution.dctRights != null) {
+        builder.addTextBody("rights", distribution.dctRights)
+      }
+
+      if(distribution.hash != null) {
+        builder.addTextBody("hash", distribution.hash)
+      }
+
+      if(distribution.manifestDownloadURL != null) {
+        builder.addTextBody(MappingPediaConstant.CKAN_RESOURCE_PROV_TRIPLES, distribution.manifestDownloadURL)
+      }
+
+      if(textBodyMap != null && textBodyMap.isDefined) {
+
+        for((key, value) <- textBodyMap.get) {
+
+          if(key != null && value != null) {
+            builder.addTextBody(key, value)
+          } else {
+            logger.warn(s"textBodyMap key,value = ${key},${value}")
+          }
+        }
+      }
+
+
+
+      val mpEntity = builder.build();
+      httpPostRequest.setEntity(mpEntity)
+      val response = httpClient.execute(httpPostRequest)
+
+
+      if (response.getStatusLine.getStatusCode < 200 || response.getStatusLine.getStatusCode >= 300) {
+        logger.info(s"response = ${response}")
+        logger.info(s"response.getEntity= ${response.getEntity}");
+        logger.info(s"response.getEntity.getContent= ${response.getEntity.getContent}");
+        logger.info(s"response.getEntity.getContentType= ${response.getEntity.getContentType}");
+        logger.info(s"response.getProtocolVersion= ${response.getProtocolVersion}");
+        logger.info(s"response.getStatusLine= ${response.getStatusLine}");
+        logger.info(s"response.getStatusLine.getReasonPhrase= ${response.getStatusLine.getReasonPhrase}");
+
+        throw new Exception("Failed to add the file to CKAN storage. Response status line from " + createOrUpdateUrl + " was: " + response.getStatusLine)
+      }
+
+      response
+    } catch {
+      case e: Exception => {
+        e.printStackTrace()
+        //HttpURLConnection.HTTP_INTERNAL_ERROR
+        throw e;
+      }
+
+      // log error
+    } finally {
+      //if (httpClient != null) httpClient.close()
+    }
+
+
+  }
+
+  def createResource(distribution: Distribution, textBodyMap:Option[Map[String, String]]) = {
+    logger.info("CREATING A RESOURCE ON CKAN ... ")
+    this.createOrUpdateResource(CKAN_API_ACTION_RESOURCE_CREATE_URL, distribution, textBodyMap);
+  }
+
+  def updateResource(distribution: Distribution, textBodyMap:Option[Map[String, String]]) = {
+    logger.info("UPDATING A RESOURCE ON CKAN ... ")
+    val textBodyMap2 = textBodyMap.get + ("id" -> distribution.ckanResourceId);
+    this.createOrUpdateResource(CKAN_API_ACTION_RESOURCE_UPDATE_URL, distribution
+      , Some(textBodyMap2));
+  }
 
   def updateResource(filePath: String, resourceId: String) : Integer = {
     val file = new File(filePath);
@@ -257,6 +377,13 @@ class MpcCkanUtility(val ckanUrl: String, val authorizationToken: String) {
 object MpcCkanUtility {
   val logger: Logger = LoggerFactory.getLogger(this.getClass);
 
+  def getDatasetList(catalogUrl:String) = {
+    val cc: CkanClient = new CkanClient(catalogUrl)
+    val datasetList = cc.getDatasetList.asScala
+
+    logger.info(s"ckanDatasetList $catalogUrl = " + datasetList)
+    new ListResult[String](datasetList.size, datasetList)
+  }
 
   def getResult(response:CloseableHttpResponse) = {
     if(response == null) {

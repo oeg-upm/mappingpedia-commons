@@ -4,6 +4,7 @@ import java.io._
 import java.util.UUID
 
 import es.upm.fi.dia.oeg.mappingpedia.MappingPediaConstant
+import es.upm.fi.dia.oeg.mappingpedia.model.result.ListResult
 import org.slf4j.{Logger, LoggerFactory}
 import org.springframework.web.multipart.MultipartFile
 
@@ -207,4 +208,6 @@ object MpcUtility {
       }
     }
   }
+
+
 }

@@ -17,6 +17,15 @@ import scala.collection.JavaConversions._
 class MPCJenaUtility(val ontModel:OntModel) {
   val logger: Logger = LoggerFactory.getLogger(this.getClass);
 
+
+
+  def getSchemaOrgSubclassesDetail(aClass:String) = {
+    logger.info(s"jenaClient = $this")
+    logger.info(s"this.ontologyModel = ${this.ontModel}")
+
+    this.getSubclassesDetail(aClass);
+  }
+
   val mapNormalizedTerms:Map[String, String] = {
     val subclassesLocalNames = this.getSubclassesSummary("Thing").results.asInstanceOf[List[String]];
     val subclassesURIs= this.getSubclassesSummary("http://schema.org/Thing").results.asInstanceOf[List[String]];
@@ -156,6 +165,21 @@ class MPCJenaUtility(val ontModel:OntModel) {
     //});
 
 
+  }
+
+  def getSubclassesSummaryNormalized(pClass:String) = {
+    //val classURI = MappingPediaUtility.getClassURI(pClass, "http://schema.org/");
+
+    val normalizedClasses = MappingPediaUtility.normalizeTerm(pClass).distinct;
+    logger.info(s"normalizedClasses = $normalizedClasses");
+
+    val resultAux:List[String] = normalizedClasses.flatMap(normalizedClass => {
+      logger.info(s"normalizedClass = $normalizedClass");
+      val schemaClass:String = this.mapNormalizedTerms.getOrElse(normalizedClass, normalizedClass);
+      logger.info(s"schemaClass = $schemaClass");
+      this.getSubclassesSummary(schemaClass).results.asInstanceOf[List[String]]
+    }).distinct;
+    new ListResult(resultAux.size, resultAux)
   }
 
   def getSubclassesSummary(aClass:String) = {
