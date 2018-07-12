@@ -8,7 +8,6 @@ import java.util.Properties
 import com.mashape.unirest.http.Unirest
 import es.upm.fi.dia.oeg.mappingpedia.model.Distribution
 import es.upm.fi.dia.oeg.mappingpedia.model.result.ListResult
-import es.upm.fi.dia.oeg.mappingpedia.utility.MpcCkanUtility.logger
 import es.upm.fi.dia.oeg.mappingpedia.{MappingPediaConstant, MappingPediaProperties}
 import eu.trentorise.opendata.jackan.CkanClient
 import org.json.{JSONArray, JSONObject}
@@ -47,8 +46,8 @@ class MpcCkanUtility(val ckanUrl: String, val authorizationToken: String) {
   val CKAN_FIELD_PACKAGE_ID = "package_id";
   val CKAN_FIELD_URL = "url";
 
-<<<<<<< HEAD
   val ckanVersion:Option[String] = {
+    logger.info(s"Hitting endpoint ${CKAN_API_ACTION_STATUS_SHOW_URL}");
     val response = Unirest.get(CKAN_API_ACTION_STATUS_SHOW_URL).asJson();
     val responseStatus = response.getStatus;
     if(responseStatus >= 200 && responseStatus < 300) {
@@ -119,9 +118,7 @@ class MpcCkanUtility(val ckanUrl: String, val authorizationToken: String) {
   }
 
   def createOrUpdateResource(ckanAction:String, distribution: Distribution, textBodyMap:Option[Map[String, String]]) = {
-=======
-  def createOrUpdateResource(createOrUpdateUrl:String, distribution: Distribution, textBodyMap:Option[Map[String, String]]) = {
->>>>>>> 8a9af01dde5d6bbfbdc65221c92a53297079bc66
+
     //val dataset = distribution.dataset;
 
     //val packageId = distribution.dataset.dctIdentifier;
@@ -135,11 +132,7 @@ class MpcCkanUtility(val ckanUrl: String, val authorizationToken: String) {
     val httpClient = HttpClientBuilder.create.build
     try {
 
-<<<<<<< HEAD
       val createOrUpdateUrl = ckanUrl + ckanAction
-=======
-      //val createOrUpdateUrl = ckanUrl + ckanAction
->>>>>>> 8a9af01dde5d6bbfbdc65221c92a53297079bc66
       logger.info(s"Hitting endpoint: $createOrUpdateUrl");
 
       val httpPostRequest = new HttpPost(createOrUpdateUrl)
@@ -231,21 +224,8 @@ class MpcCkanUtility(val ckanUrl: String, val authorizationToken: String) {
 
 
   }
-<<<<<<< HEAD
-=======
 
-  def createResource(distribution: Distribution, textBodyMap:Option[Map[String, String]]) = {
-    logger.info("CREATING A RESOURCE ON CKAN ... ")
-    this.createOrUpdateResource(CKAN_API_ACTION_RESOURCE_CREATE_URL, distribution, textBodyMap);
-  }
 
-  def updateResource(distribution: Distribution, textBodyMap:Option[Map[String, String]]) = {
-    logger.info("UPDATING A RESOURCE ON CKAN ... ")
-    val textBodyMap2 = textBodyMap.get + ("id" -> distribution.ckanResourceId);
-    this.createOrUpdateResource(CKAN_API_ACTION_RESOURCE_UPDATE_URL, distribution
-      , Some(textBodyMap2));
-  }
->>>>>>> 8a9af01dde5d6bbfbdc65221c92a53297079bc66
 
   def updateResource(filePath: String, resourceId: String) : Integer = {
     val file = new File(filePath);
