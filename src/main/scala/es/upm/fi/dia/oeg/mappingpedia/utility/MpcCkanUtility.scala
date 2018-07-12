@@ -8,7 +8,6 @@ import java.util.Properties
 import com.mashape.unirest.http.Unirest
 import es.upm.fi.dia.oeg.mappingpedia.model.Distribution
 import es.upm.fi.dia.oeg.mappingpedia.model.result.ListResult
-import es.upm.fi.dia.oeg.mappingpedia.utility.MpcCkanUtility.logger
 import es.upm.fi.dia.oeg.mappingpedia.{MappingPediaConstant, MappingPediaProperties}
 import eu.trentorise.opendata.jackan.CkanClient
 import org.json.{JSONArray, JSONObject}
@@ -25,25 +24,101 @@ import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.http.util.EntityUtils
 
 import scala.collection.mutable.ListBuffer
-
+import eu.trentorise.opendata.jackan.CkanClient
 
 class MpcCkanUtility(val ckanUrl: String, val authorizationToken: String) {
   val logger: Logger = LoggerFactory.getLogger(this.getClass);
 
+  val CKAN_API_ACTION_RESOURCE_CREATE = "/api/action/resource_create";
+  val CKAN_API_ACTION_RESOURCE_UPDATE = "/api/action/resource_update";
+
+  val CKAN_API_ACTION_STATUS_SHOW_URL = ckanUrl + "/api/action/status_show";
   val CKAN_API_ACTION_ORGANIZATION_SHOW_URL = ckanUrl + "/api/action/organization_show";
   val CKAN_API_ACTION_PACKAGE_SHOW_URL = ckanUrl + "/api/action/package_show";
   val CKAN_API_ACTION_PACKAGE_CREATE_URL = ckanUrl + "/api/action/package_create";
   val CKAN_API_ACTION_PACKAGE_UPDATE_URL = ckanUrl + "/api/action/package_update";
   val CKAN_API_ACTION_RESOURCE_SHOW_URL = ckanUrl + "/api/action/resource_show";
-  val CKAN_API_ACTION_RESOURCE_CREATE_URL = ckanUrl + "/api/action/resource_create";
-  val CKAN_API_ACTION_RESOURCE_UPDATE_URL = ckanUrl + "/api/action/resource_update";
+  val CKAN_API_ACTION_RESOURCE_CREATE_URL = ckanUrl + CKAN_API_ACTION_RESOURCE_CREATE;
+  val CKAN_API_ACTION_RESOURCE_UPDATE_URL = ckanUrl + CKAN_API_ACTION_RESOURCE_UPDATE;
 
   val CKAN_FIELD_NAME = "name";
   val CKAN_FIELD_DESCRIPTION = "description";
   val CKAN_FIELD_PACKAGE_ID = "package_id";
   val CKAN_FIELD_URL = "url";
 
-  def createOrUpdateResource(createOrUpdateUrl:String, distribution: Distribution, textBodyMap:Option[Map[String, String]]) = {
+  val ckanVersion:Option[String] = {
+    logger.info(s"Hitting endpoint ${CKAN_API_ACTION_STATUS_SHOW_URL}");
+    val response = Unirest.get(CKAN_API_ACTION_STATUS_SHOW_URL).asJson();
+    val responseStatus = response.getStatus;
+    if(responseStatus >= 200 && responseStatus < 300) {
+      val ckanVersion = response.getBody.getObject.getJSONObject("result").getString("ckan_version");
+      Some(ckanVersion)
+    } else {
+      None
+    }
+  }
+
+  def createPackage(jsonObj:JSONObject) = {
+    logger.info(s"Hitting endpoint: ${CKAN_API_ACTION_PACKAGE_CREATE_URL}");
+
+    val response = Unirest.post(CKAN_API_ACTION_PACKAGE_CREATE_URL)
+      .header("Authorization", this.authorizationToken)
+      .body(jsonObj)
+      .asJson();
+
+    val responseStatus = response.getStatus
+    logger.info(s"\tresponseStatus = ${responseStatus}");
+
+    val responseStatusText = response.getStatusText
+    if (responseStatus < 200 || responseStatus >= 300) {
+      logger.info(s"response.getBody= ${response.getBody}");
+      logger.info(s"response.getHeaders= ${response.getHeaders}");
+      logger.info(s"response.getRawBody= ${response.getRawBody}");
+      logger.info(s"response.getStatus= ${response.getStatus}");
+      logger.info(s"response.getStatusText= ${response.getStatusText}");
+      throw new Exception(responseStatusText)
+    }
+
+    response;
+  }
+
+  def createPackage(fields: Map[String, String]) = {
+    logger.info(s"Hitting endpoint: ${CKAN_API_ACTION_PACKAGE_CREATE_URL}");
+
+    val response = Unirest.post(CKAN_API_ACTION_PACKAGE_CREATE_URL)
+      .header("Authorization", this.authorizationToken)
+      .fields(fields)
+      .asJson();
+
+    val responseStatus = response.getStatus
+    logger.info(s"\tresponseStatus = ${responseStatus}");
+
+    val responseStatusText = response.getStatusText
+    if (responseStatus < 200 || responseStatus >= 300) {
+      logger.info(s"response.getBody= ${response.getBody}");
+      logger.info(s"response.getHeaders= ${response.getHeaders}");
+      logger.info(s"response.getRawBody= ${response.getRawBody}");
+      logger.info(s"response.getStatus= ${response.getStatus}");
+      logger.info(s"response.getStatusText= ${response.getStatusText}");
+      throw new Exception(responseStatusText)
+    }
+
+    response;
+  }
+
+  def createResource(distribution: Distribution, textBodyMap:Option[Map[String, String]]) = {
+    logger.info("CREATING A RESOURCE ON CKAN ... ")
+    this.createOrUpdateResource(CKAN_API_ACTION_RESOURCE_CREATE, distribution, textBodyMap);
+  }
+
+  def updateResource(distribution: Distribution, textBodyMap:Option[Map[String, String]]) = {
+    logger.info("UPDATING A RESOURCE ON CKAN ... ")
+    val textBodyMap2 = textBodyMap.get + ("id" -> distribution.ckanResourceId);
+    this.createOrUpdateResource(CKAN_API_ACTION_RESOURCE_UPDATE, distribution, Some(textBodyMap2));
+  }
+
+  def createOrUpdateResource(ckanAction:String, distribution: Distribution, textBodyMap:Option[Map[String, String]]) = {
+
     //val dataset = distribution.dataset;
 
     //val packageId = distribution.dataset.dctIdentifier;
@@ -57,7 +132,7 @@ class MpcCkanUtility(val ckanUrl: String, val authorizationToken: String) {
     val httpClient = HttpClientBuilder.create.build
     try {
 
-      //val createOrUpdateUrl = ckanUrl + ckanAction
+      val createOrUpdateUrl = ckanUrl + ckanAction
       logger.info(s"Hitting endpoint: $createOrUpdateUrl");
 
       val httpPostRequest = new HttpPost(createOrUpdateUrl)
@@ -150,17 +225,7 @@ class MpcCkanUtility(val ckanUrl: String, val authorizationToken: String) {
 
   }
 
-  def createResource(distribution: Distribution, textBodyMap:Option[Map[String, String]]) = {
-    logger.info("CREATING A RESOURCE ON CKAN ... ")
-    this.createOrUpdateResource(CKAN_API_ACTION_RESOURCE_CREATE_URL, distribution, textBodyMap);
-  }
 
-  def updateResource(distribution: Distribution, textBodyMap:Option[Map[String, String]]) = {
-    logger.info("UPDATING A RESOURCE ON CKAN ... ")
-    val textBodyMap2 = textBodyMap.get + ("id" -> distribution.ckanResourceId);
-    this.createOrUpdateResource(CKAN_API_ACTION_RESOURCE_UPDATE_URL, distribution
-      , Some(textBodyMap2));
-  }
 
   def updateResource(filePath: String, resourceId: String) : Integer = {
     val file = new File(filePath);
@@ -316,7 +381,7 @@ class MpcCkanUtility(val ckanUrl: String, val authorizationToken: String) {
     response
   }
 
-  def findPackageByPackageName(organizationId:String, packageName:String) = {
+  def findPackageByPackageName(organizationId:String, packageName:String) : List[JSONObject] = {
     logger.info("findPackageByPackageName");
 
 
@@ -326,30 +391,34 @@ class MpcCkanUtility(val ckanUrl: String, val authorizationToken: String) {
     val response = Unirest.get(uri)
       .header("Authorization", this.authorizationToken)
       .asJson();
+    val responseStatus = response.getStatus;
+    if(responseStatus >= 200 && responseStatus < 300) {
+      val responseBody = response.getBody;
 
-    val responseBody = response.getBody;
+      val result = responseBody.getObject().getJSONObject("result");
 
-    val result = responseBody.getObject().getJSONObject("result");
+      val packages:JSONArray = result.getJSONArray("packages");
 
-    val packages:JSONArray = result.getJSONArray("packages");
+      /*
+      import java.security.CodeSource
+      val klass = classOf[JSONArray]
+      val codeSource = klass.getProtectionDomain.getCodeSource
+      if (codeSource != null) {
+        logger.info(s"JSONArray is loaded from: ${codeSource.getLocation}");
+      }
+      */
 
-    /*
-    import java.security.CodeSource
-    val klass = classOf[JSONArray]
-    val codeSource = klass.getProtectionDomain.getCodeSource
-    if (codeSource != null) {
-      logger.info(s"JSONArray is loaded from: ${codeSource.getLocation}");
+      val packagesList = packages.toIterator.toList
+      logger.info(s"packagesList");
+
+      val filteredPackages = packagesList.filter(_.asInstanceOf[JSONObject].getString("title").equals(packageName))
+      logger.info(s"filteredPackages");
+
+
+      filteredPackages.asInstanceOf[List[JSONObject]]
+    } else {
+      Nil;
     }
-    */
-
-    val packagesList = packages.toIterator.toList
-    logger.info(s"packagesList");
-
-    val filteredPackages = packagesList.filter(_.asInstanceOf[JSONObject].getString("title").equals(packageName))
-    logger.info(s"filteredPackages");
-
-
-    filteredPackages.asInstanceOf[List[JSONObject]]
   }
 
 
