@@ -13,6 +13,10 @@ class UnannotatedDistribution (dataset: Dataset, dctIdentifier:String)
     this(new Dataset(organizationId, datasetId), dctIdentifier);
   }
 
+  def this(organizationId:String, datasetId:String) {
+    this(organizationId, datasetId, UUID.randomUUID.toString);
+  }
+
   dataset.addDistribution(this);
 
 }

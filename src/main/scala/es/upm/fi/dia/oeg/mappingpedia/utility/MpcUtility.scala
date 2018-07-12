@@ -4,11 +4,44 @@ import java.io._
 import java.util.UUID
 
 import es.upm.fi.dia.oeg.mappingpedia.MappingPediaConstant
+import es.upm.fi.dia.oeg.mappingpedia.model.result.ListResult
 import org.slf4j.{Logger, LoggerFactory}
 import org.springframework.web.multipart.MultipartFile
 
 object MpcUtility {
   val logger: Logger = LoggerFactory.getLogger(this.getClass);
+
+  def detectMappingLanguage(mappingDocumentFile:File) : String = {
+    if(mappingDocumentFile == null) {
+      "r2rml"
+    } else {
+      val absolutePath = mappingDocumentFile.getAbsolutePath;
+      this.detectMappingLanguage(absolutePath);
+    }
+  }
+
+  def detectMappingLanguage(mappingDocumentDownloadURL:String) : String = {
+
+    val mappingLanguage = if (mappingDocumentDownloadURL != null) {
+      val splitedMappingLanguage = mappingDocumentDownloadURL.split("\\.")
+
+      if (splitedMappingLanguage.length >= 3) {
+        val extension1 = splitedMappingLanguage(splitedMappingLanguage.length-2);
+        val extension2 = splitedMappingLanguage(splitedMappingLanguage.length-1);
+
+        if("rml".equalsIgnoreCase(extension1) && "ttl".equalsIgnoreCase(extension2)) {
+          "rml"
+        } else {
+          "r2rml"
+        }
+      } else {
+        "r2rml"
+      }
+    } else {
+      "r2rml"
+    }
+    mappingLanguage
+  }
 
   def multipartFileToFile(fileRef:MultipartFile) : File = {
     val file = if(fileRef != null) {
@@ -175,4 +208,6 @@ object MpcUtility {
       }
     }
   }
+
+
 }
