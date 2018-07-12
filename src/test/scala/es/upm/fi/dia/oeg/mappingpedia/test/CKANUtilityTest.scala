@@ -29,9 +29,11 @@ object CKANUtilityTest {
 
 
     val ckanUtility = new MpcCkanUtility(mappingpediaProperties.ckanURL, mappingpediaProperties.ckanKey)
-    val responseSuccess = ckanUtility.findPackageByPackageName("zaragoza_spain", "zaragoza-farmacias")
-    val responseFailed = ckanUtility.findPackageByPackageName("zaragoza_spain", "zaragoza-farmacias111")
-
+    //val responseSuccess = ckanUtility.findPackageByPackageName("zaragoza_spain", "zaragoza-farmacias")
+    //val responseFailed = ckanUtility.findPackageByPackageName("zaragoza_spain", "zaragoza-farmacias111")
+    val ckanVersion = ckanUtility.ckanVersion;
+    logger.info(s"ckanVersion = ${ckanVersion}")
+    
     println("Bye")
   }
 
