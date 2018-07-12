@@ -100,6 +100,12 @@
             <version>20180130</version>
         </dependency>
 
+		<dependency>
+			<groupId>eu.trentorise.opendata</groupId>
+			<artifactId>jackan</artifactId>
+			<version>0.4.2</version>
+		</dependency>
+
     </dependencies>
 
 	<repositories>
