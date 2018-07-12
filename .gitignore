@@ -5,3 +5,8 @@ target/
 mappingpedia-commons.iml
 *.iml
 src/main/resources/config.properties
+.project
+.cache-main
+.classpath
+.cache-tests
+.settings/
