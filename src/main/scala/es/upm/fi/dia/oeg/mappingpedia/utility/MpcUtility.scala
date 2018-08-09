@@ -11,6 +11,40 @@ import org.springframework.web.multipart.MultipartFile
 object MpcUtility {
   val logger: Logger = LoggerFactory.getLogger(this.getClass);
 
+  def calculateHash(downloadURL:String) : String = {
+    this.calculateHash(downloadURL, null);
+  }
+
+  def calculateHash(downloadURL:String, pEncoding:String) : String = {
+    logger.debug(s"calculating hash value of ${downloadURL}");
+    val encoding = if(pEncoding == null) { "UTF-8" } else { pEncoding }
+
+    val hashValue = try {
+      if (downloadURL != null) {
+        val downloadURLContent = scala.io.Source.fromURL(downloadURL, encoding).mkString
+        //logger.info(s"downloadURLContent ${downloadURLContent}");
+
+        //val downloadURLContentBase64 = GitHubUtility.encodeToBase64(downloadURLContent);
+        //logger.info(s"downloadURLContentBase64 ${downloadURLContentBase64}");
+
+        //MessageDigest.getInstance("SHA").digest(downloadURLContentBase64.getBytes).toString
+
+        downloadURLContent.hashCode.toString;
+
+      } else {
+        null
+      }
+    } catch {
+      case e:Exception => {
+        e.printStackTrace()
+        null
+      }
+    }
+
+    logger.debug(s"hash value of of ${downloadURL} = ${hashValue}");
+    hashValue
+  }
+  
   def detectMappingLanguage(mappingDocumentFile:File) : String = {
     if(mappingDocumentFile == null) {
       "r2rml"
