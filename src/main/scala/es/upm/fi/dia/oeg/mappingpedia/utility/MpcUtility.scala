@@ -243,5 +243,28 @@ object MpcUtility {
     }
   }
 
+  def stringToBoolean(inputString:String) : Boolean = {
+    try {
+      val listOfTrueString = List("true", "yes");
+
+      val result = if(inputString == null) {
+        false
+      } else {
+        if(listOfTrueString.contains(inputString)) {
+          true
+        } else {
+          false
+        }
+      }
+
+      result
+    } catch {
+      case e:Exception => {
+        e.printStackTrace()
+        false
+      }
+    }
+
+  }
 
 }
