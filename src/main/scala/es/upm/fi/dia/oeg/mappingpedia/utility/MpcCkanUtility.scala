@@ -48,14 +48,22 @@ class MpcCkanUtility(val ckanUrl: String, val authorizationToken: String) {
 
   val ckanVersion:Option[String] = {
     logger.info(s"Hitting endpoint ${CKAN_API_ACTION_STATUS_SHOW_URL}");
-    val response = Unirest.get(CKAN_API_ACTION_STATUS_SHOW_URL).asJson();
-    val responseStatus = response.getStatus;
-    if(responseStatus >= 200 && responseStatus < 300) {
-      val ckanVersion = response.getBody.getObject.getJSONObject("result").getString("ckan_version");
-      Some(ckanVersion)
-    } else {
-      None
+    try {
+      val response = Unirest.get(CKAN_API_ACTION_STATUS_SHOW_URL).asJson();
+      val responseStatus = response.getStatus;
+      if(responseStatus >= 200 && responseStatus < 300) {
+        val ckanVersion = response.getBody.getObject.getJSONObject("result").getString("ckan_version");
+        Some(ckanVersion)
+      } else {
+        None
+      }
+    } catch {
+      case e:Exception => {
+        logger.warn("\tError obtaining CKAN version: " + e.getMessage)
+        None
+      }
     }
+
   }
 
   def createPackage(jsonObj:JSONObject) = {
