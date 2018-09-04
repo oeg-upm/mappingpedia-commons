@@ -19,6 +19,12 @@
 
 	<dependencies>
 
+		<dependency>
+			<groupId>de.escalon.hypermedia</groupId>
+			<artifactId>hydra-spring</artifactId>
+			<version>0.3.1</version>
+		</dependency>
+
         <!-- https://mvnrepository.com/artifact/org.apache.jena/jena-core -->
 <!--        <dependency>
             <groupId>org.apache.jena</groupId>
@@ -96,18 +102,19 @@
 		</dependency>
 
         <!-- https://mvnrepository.com/artifact/org.springframework/spring-web -->
-        <dependency>
+<!--        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
             <version>5.0.6.RELEASE</version>
-        </dependency>
+        </dependency>-->
 
         <!-- https://mvnrepository.com/artifact/org.json/json -->
-        <dependency>
+<!--        <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
             <version>20180130</version>
-        </dependency>
+        </dependency>-->
+
 
 		<dependency>
 			<groupId>eu.trentorise.opendata</groupId>
