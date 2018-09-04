@@ -10,6 +10,8 @@ class Agent(val dctIdentifier:String) {
   var foafName:String = null;
   var foafMbox:String = null;
 
+  def getId = this.dctIdentifier
+  def getName = this.foafName
 }
 
 object Agent {
