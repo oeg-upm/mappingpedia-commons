@@ -5,6 +5,8 @@ import java.io.{ByteArrayInputStream, File, InputStream}
 import java.util.Properties
 
 import es.upm.fi.dia.oeg.mappingpedia.MappingPediaConstant
+import es.upm.fi.dia.oeg.mappingpedia.model.{Agent, MpcTriple}
+import es.upm.fi.dia.oeg.mappingpedia.model.result.ListResult
 import org.apache.jena.graph.Triple
 import org.apache.jena.rdf.model.{Model, ModelFactory}
 import org.apache.jena.util.FileManager
@@ -129,6 +131,36 @@ class MpcVirtuosoUtility(val virtuosoJDBC:String, val virtuosoUser:String, val v
 
     model.read(inputStream, null, lang);
     model;
+  }
+
+  def getInstanceDetails(instanceUri:String) = {
+    val queryString = s"SELECT * WHERE { <${instanceUri}> ?p ?o . }"
+    val queryExecution = this.createQueryExecution(queryString);
+
+    var results: List[MpcTriple] = List.empty;
+    try {
+      val rs = queryExecution.execSelect
+      //logger.info("Obtaining result from executing query=\n" + queryString)
+      while (rs.hasNext) {
+
+        val qs = rs.nextSolution
+        val p = qs.get("p").toString;
+        val o = MappingPediaUtility.getStringOrElse(qs, "o", null)
+        val triple = new MpcTriple(instanceUri, p, o);
+
+        results = triple :: results;
+      }
+    }
+    catch {
+      case e:Exception => {
+        e.printStackTrace()
+        logger.error(s"Error execution query: ${e.getMessage}")
+      }
+    }
+    finally queryExecution.close
+
+    val listResult = new ListResult[MpcTriple](results.length, results);
+    listResult
   }
 
 }
