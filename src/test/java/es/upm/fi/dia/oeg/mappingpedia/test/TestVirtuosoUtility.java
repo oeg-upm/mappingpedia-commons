@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
+import es.upm.fi.dia.oeg.mappingpedia.model.MpcTriple;
 import es.upm.fi.dia.oeg.mappingpedia.model.result.ListResult;
 import es.upm.fi.dia.oeg.mappingpedia.utility.MpcVirtuosoUtility;
 import scala.Tuple2;
@@ -19,7 +20,7 @@ class TestVirtuosoUtility {
 	@Test
 	void testGetInstanceDetails() {
 		String instanceUri = "http://mappingpedia.linkeddata.es/instance/mappingdocument/mappingExecutionResult-3664aab7-74b9-4cd3-89a2-382bd468b3e3";
-		ListResult<Tuple2<String, String>> result = virtuosoUtility.getInstanceDetails(instanceUri);
+		ListResult<MpcTriple> result = virtuosoUtility.getInstanceDetails(instanceUri);
 		logger.info("instanceUri = " + instanceUri);
 		
 		assertTrue(true);
