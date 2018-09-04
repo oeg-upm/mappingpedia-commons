@@ -6,7 +6,7 @@ import java.net.HttpURLConnection
 import java.util.Properties
 
 import com.mashape.unirest.http.Unirest
-import es.upm.fi.dia.oeg.mappingpedia.model.Distribution
+import es.upm.fi.dia.oeg.mappingpedia.model.{Agent, Distribution}
 import es.upm.fi.dia.oeg.mappingpedia.model.result.ListResult
 import es.upm.fi.dia.oeg.mappingpedia.{MappingPediaConstant, MappingPediaProperties}
 import eu.trentorise.opendata.jackan.CkanClient
@@ -34,6 +34,8 @@ class MpcCkanUtility(val ckanUrl: String, val authorizationToken: String) {
 
   val CKAN_API_ACTION_STATUS_SHOW_URL = ckanUrl + "/api/action/status_show";
   val CKAN_API_ACTION_ORGANIZATION_SHOW_URL = ckanUrl + "/api/action/organization_show";
+  val CKAN_API_ACTION_ORGANIZATION_LIST = ckanUrl + "/api/action/organization_list?all_fields=true";
+
   val CKAN_API_ACTION_PACKAGE_SHOW_URL = ckanUrl + "/api/action/package_show";
   val CKAN_API_ACTION_PACKAGE_CREATE_URL = ckanUrl + "/api/action/package_create";
   val CKAN_API_ACTION_PACKAGE_UPDATE_URL = ckanUrl + "/api/action/package_update";
@@ -389,6 +391,39 @@ class MpcCkanUtility(val ckanUrl: String, val authorizationToken: String) {
     response
   }
 
+  def getOrganizations(): ListResult[Agent] = {
+    logger.info("getOrganizations");
+
+      val uri = CKAN_API_ACTION_ORGANIZATION_LIST;
+      logger.info(s"Hitting endpoint: ${uri}");
+
+      val response = Unirest.get(uri)
+        .header("Authorization", this.authorizationToken)
+        .asJson();
+      val responseStatus = response.getStatus;
+      val results:ListResult[Agent] = if(responseStatus >= 200 && responseStatus < 300) {
+        val responseBody = response.getBody;
+        val jsonArray = responseBody.getObject.getJSONArray("result");
+        val organizations = MpcCkanUtility.toJsonObjectList(jsonArray);
+        val agents = organizations.map(organization => {
+          val agent = new Agent(organization.getString("id"))
+          agent.foafName = organization.getString("name")
+          agent
+        });
+
+        new ListResult[Agent](organizations.length, organizations.map(organization => {
+          val agent = new Agent(organization.getString("id"))
+          agent.foafName = organization.getString("name")
+          agent
+        }));
+      } else {
+        new ListResult(0, Nil)
+      }
+
+      results
+
+  }
+
   def findPackageByPackageName(organizationId:String, packageName:String) : List[JSONObject] = {
     logger.info("findPackageByPackageName");
 
@@ -457,6 +492,19 @@ class MpcCkanUtility(val ckanUrl: String, val authorizationToken: String) {
 object MpcCkanUtility {
   val logger: Logger = LoggerFactory.getLogger(this.getClass);
 
+  def apply() = {
+    val propertiesFilePath = "/" + MappingPediaConstant.DEFAULT_CONFIGURATION_FILENAME;
+    val in = getClass.getResourceAsStream(propertiesFilePath)
+    val properties = new Properties();
+    properties.load(in)
+    logger.debug(s"properties.keySet = ${properties.keySet()}")
+
+    new MpcCkanUtility(
+      properties.getProperty(MappingPediaConstant.CKAN_URL)
+      , properties.getProperty(MappingPediaConstant.CKAN_KEY)
+    );
+  }
+
   def getDatasetList(catalogUrl:String) = {
     val cc: CkanClient = new CkanClient(catalogUrl)
     val datasetList = cc.getDatasetList.asScala
@@ -506,6 +554,19 @@ object MpcCkanUtility {
       val entity = EntityUtils.toString(httpEntity)
       val responseEntity = new JSONObject(entity);
       responseEntity.getJSONObject("result").getString("package_id");
+    }
+  }
+
+  def toJsonObjectList(jsonArray:JSONArray) : List[JSONObject] = {
+    if(jsonArray != null) {
+      var result:List[JSONObject] = Nil;
+      for(i <- 0 to jsonArray.length() -1) {
+        val jsonObject = jsonArray.getJSONObject(i);
+        result = result :+ jsonObject
+      }
+      result
+    } else {
+      Nil
     }
   }
 }
